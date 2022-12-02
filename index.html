@@ -1,1 +1,18 @@
-teste
+<h1>Cloudflare WAF complete bypass</h1>
+
+<h2>Objective</h2>
+Just to clarify the Objective of this paper, Cloudflare stated to me this does "not appear to be any security implications as a direct result of this behavior", so this paper is so Cloudflare WAF clients understand the criticality of NEVER, in anyway, disclose the Origin IP address, through stacktrace, DNS history, DNS enumeration, subdomain enumeration or even social engineering.
+
+<h2>Requirements</h2>
+Origin IP address
+
+<h2>Impact</h2>
+The attacker is able to bypass completely: cloudflare WAF, managed rules, ip access rules, page rules, cache
+All this with the bonus of not being logged on the target waf in anyway
+
+<h2>mitigations</h2>
+* Rotate your IP address and make the possible and impossible to never leak the Origin IP address
+* Use a custom authenticated Origin pull certificate (Enterprise only) (not tested)
+* Use a cloudflare tunnel and NEVER leak the cname
+
+<h2>Walkthrough</h2>
