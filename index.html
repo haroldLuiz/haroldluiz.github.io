@@ -1,97 +1,97 @@
-<h1>Cloudflare WAF complete bypass</h1>
-
-<h2>Objective</h2>
-Just to clarify the Objective of this paper, Cloudflare stated to me this does "not appear to be any security implications as a direct result of this behavior", so this paper is so Cloudflare WAF clients understand the criticality of NEVER, in anyway, disclose the Origin IP address, through stacktrace, DNS history, DNS enumeration, subdomain enumeration or even social engineering.
-
-<h2>Requirements</h2>
-Origin IP address
-
-<h2>Impact</h2>
-The attacker is able to bypass completely: cloudflare WAF, managed rules, ip access rules, page rules, cache
-All this with the bonus of not being logged on the target waf in anyway
-Being able to HTTP DOS, ignore any WAF restrictions, and test/exploit any vulnerabilities that would otherwise be blocked by the managed rules.
-
-<h2>mitigations</h2>
-* Rotate your IP address and make the possible and impossible to never leak the Origin IP address
-* Use a custom authenticated Origin pull certificate (Enterprise only) (not tested)
-* Use a cloudflare tunnel and NEVER leak the cname
-
-<h2>Walkthrough</h2>
-
-<h3>Initial state</h3>
-First lets enumerate all already enabled or not security layers on the attacked application:
-
-
-UFW with default incoming block, with those exceptions:
-<img src="images/01UFW.png">
-Authenticated origin pull not configured, cloudflare edge certificate being used:
-<img src="images/02initial_apache_conf.png">
-Only one cloudflare DNS entry, proxyng traffic to the attacked application. (Also note this account email is "@hotmail.com")
-<img src="images/03pix2pix_dns.png">
-SSL/TLS on Full (strict) since is using a Edge certificate
-<img src="images/04pix2pix_ssl.png">
-Initially desactivated Authenticated Origin Pulls
-<img src="images/05pix2pix_initial_pull.png">
-No enabled WAF rules
-<img src="images/06pix2pix_initial_waf.png">
-And here is the webpage:
-<img src="images/07pix2pix_page.png">
-
-Lets setup a WAF rule to bypass as a example:
-The rule:
-<img src="images/08pix2pix_waf_rule.png">
-Turning it on:
-<img src="images/09pix2pix_blocking.png">
-Testing the rule:
-<img src="images/10pix2pix_blocked.png">
-
-<h3>Bypassing UFW</h3>
-On this step i will show how to bypass the Firewall IPTables rules (UFW)
-
-As stated before, as a requirement for this bypass you need to know/discover the Origin IP fo the target in one of the many possivle ways, this screenshot shows, a DNS entry on another domain, another account (@gmail.com) to the same Origin IP.
-<img src="images/11cart_dns.png">
-SSL/TLS need to be setup to "Full" since the Edge certificate is from another account
-<img src="images/12cart_ssl.png">
-For now the Authenticated Origin Pull will be off
-<img src="images/13cart_pull.png">
-No WAF rules:
-<img src="images/14cart_waf.png">
-No HTTP DOS protection:
-<img src="images/15_cart_dos.png">
-Since we will be talking to the IP through cloudflare, the IP IS IN THE UFW LIST already, since this attacked account has no security layers from cloudflare enabled, we are able to bypass the "block all" cloudflare waf rule as well any of the already stated cloudflare features (cloudflare WAF, managed rules, ip access rules, page rules, cache), not being logged in the waf, because the logs will be on the attacker own account.
-<img src="images/16_cart_bypassed1.png">
-
-<h3>Bypassing Authenticated Origin Pulls</h3>
-One of the security layers recomended by cloudflare to protect the Origin server are the "Authenticated Origin pulls", so lets activate it.
-
-Setting up apache
-<img src="images/17pix2pix_enabling_auth.png">
-Enabling on cloudflare
-<img src="images/18pix2pix_enabling_auth_2.png">
-Temporarily disabling the WAF rule for testing
-<img src="images/19pix2pix_disable_waf.png">
-WebPage succesfully loaded
-<img src="images/20pix2pix_page.png">
-
-enabling the rule
-<img src="images/21pix2pix_blocking.png">
-Being blocked by the rule
-<img src="images/22pix2pix_blocked.png">
-
-Lets open the attacker URL again and see what happens:
-<img src="images/23cart_without_pull.png">
-
-The problem is, non enterprise accounts, and even probaly most enterprise accounts that use authenticated origin pull, use cloudflare recommended certificate (https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem), so:
-
-Enabling Authenticated pull on the attacker account also:
-<img src="images/24cart_pull_enabled.png">
-Acessing the attacker website, bypassing both authenticated origin pull and the WAF rule:
-<img src="images/25cart_bypass.png">
-
-Since the certificate is the same for almost all Authenticated Origin Pull, enabling Authenticated origin pull on the attacker account is enough.
-
-
-If you use Cloudflare WAF, and cant periodically rotate IP at the same time you are sure the IP will not leak by the application or subdomains, use a custom authenticated pull certificate or use a cloudflare tunnel, you are facing a real risk of a attacker being able to complete ignore any security layers on cloudflare application, from WAF vulnerability mitigations to HTTP DOS.
-Or not, since cloudflare is the product owner and stated this has no impact, they are probaly right and i am probaly wrong.
-
-<h1>Protect and hide your Origin Server IP by any cost, and rotate periodically, or someone could just start mapping the entire IPv4 space and find you</h1>
+<h1>Cloudflare WAF complete bypass</h1><br>
+<br>
+<h2>Objective</h2><br>
+Just to clarify the Objective of this paper, Cloudflare stated to me this does "not appear to be any security implications as a direct result of this behavior", so this paper is so Cloudflare WAF clients understand the criticality of NEVER, in anyway, disclose the Origin IP address, through stacktrace, DNS history, DNS enumeration, subdomain enumeration or even social engineering.<br>
+<br>
+<h2>Requirements</h2><br>
+Origin IP address<br>
+<br>
+<h2>Impact</h2><br>
+The attacker is able to bypass completely: cloudflare WAF, managed rules, ip access rules, page rules, cache<br>
+All this with the bonus of not being logged on the target waf in anyway<br>
+Being able to HTTP DOS, ignore any WAF restrictions, and test/exploit any vulnerabilities that would otherwise be blocked by the managed rules.<br>
+<br>
+<h2>mitigations</h2><br>
+* Rotate your IP address and make the possible and impossible to never leak the Origin IP address<br>
+* Use a custom authenticated Origin pull certificate (Enterprise only) (not tested)<br>
+* Use a cloudflare tunnel and NEVER leak the cname<br>
+<br>
+<h2>Walkthrough</h2><br>
+<br>
+<h3>Initial state</h3><br>
+First lets enumerate all already enabled or not security layers on the attacked application:<br>
+<br>
+<br>
+UFW with default incoming block, with those exceptions:<br>
+<img src="images/01UFW.png"><br>
+Authenticated origin pull not configured, cloudflare edge certificate being used:<br>
+<img src="images/02initial_apache_conf.png"><br>
+Only one cloudflare DNS entry, proxyng traffic to the attacked application. (Also note this account email is "@hotmail.com")<br>
+<img src="images/03pix2pix_dns.png"><br>
+SSL/TLS on Full (strict) since is using a Edge certificate<br>
+<img src="images/04pix2pix_ssl.png"><br>
+Initially desactivated Authenticated Origin Pulls<br>
+<img src="images/05pix2pix_initial_pull.png"><br>
+No enabled WAF rules<br>
+<img src="images/06pix2pix_initial_waf.png"><br>
+And here is the webpage:<br>
+<img src="images/07pix2pix_page.png"><br>
+<br>
+Lets setup a WAF rule to bypass as a example:<br>
+The rule:<br>
+<img src="images/08pix2pix_waf_rule.png"><br>
+Turning it on:<br>
+<img src="images/09pix2pix_blocking.png"><br>
+Testing the rule:<br>
+<img src="images/10pix2pix_blocked.png"><br>
+<br>
+<h3>Bypassing UFW</h3><br>
+On this step i will show how to bypass the Firewall IPTables rules (UFW)<br>
+<br>
+As stated before, as a requirement for this bypass you need to know/discover the Origin IP fo the target in one of the many possivle ways, this screenshot shows, a DNS entry on another domain, another account (@gmail.com) to the same Origin IP.<br>
+<img src="images/11cart_dns.png"><br>
+SSL/TLS need to be setup to "Full" since the Edge certificate is from another account<br>
+<img src="images/12cart_ssl.png"><br>
+For now the Authenticated Origin Pull will be off<br>
+<img src="images/13cart_pull.png"><br>
+No WAF rules:<br>
+<img src="images/14cart_waf.png"><br>
+No HTTP DOS protection:<br>
+<img src="images/15_cart_dos.png"><br>
+Since we will be talking to the IP through cloudflare, the IP IS IN THE UFW LIST already, since this attacked account has no security layers from cloudflare enabled, we are able to bypass the "block all" cloudflare waf rule as well any of the already stated cloudflare features (cloudflare WAF, managed rules, ip access rules, page rules, cache), not being logged in the waf, because the logs will be on the attacker own account.<br>
+<img src="images/16_cart_bypassed1.png"><br>
+<br>
+<h3>Bypassing Authenticated Origin Pulls</h3><br>
+One of the security layers recomended by cloudflare to protect the Origin server are the "Authenticated Origin pulls", so lets activate it.<br>
+<br>
+Setting up apache<br>
+<img src="images/17pix2pix_enabling_auth.png"><br>
+Enabling on cloudflare<br>
+<img src="images/18pix2pix_enabling_auth_2.png"><br>
+Temporarily disabling the WAF rule for testing<br>
+<img src="images/19pix2pix_disable_waf.png"><br>
+WebPage succesfully loaded<br>
+<img src="images/20pix2pix_page.png"><br>
+<br>
+enabling the rule<br>
+<img src="images/21pix2pix_blocking.png"><br>
+Being blocked by the rule<br>
+<img src="images/22pix2pix_blocked.png"><br>
+<br>
+Lets open the attacker URL again and see what happens:<br>
+<img src="images/23cart_without_pull.png"><br>
+<br>
+The problem is, non enterprise accounts, and even probaly most enterprise accounts that use authenticated origin pull, use cloudflare recommended certificate (https://developers.cloudflare.com/ssl/static/authenticated_origin_pull_ca.pem), so:<br>
+<br>
+Enabling Authenticated pull on the attacker account also:<br>
+<img src="images/24cart_pull_enabled.png"><br>
+Acessing the attacker website, bypassing both authenticated origin pull and the WAF rule:<br>
+<img src="images/25cart_bypass.png"><br>
+<br>
+Since the certificate is the same for almost all Authenticated Origin Pull, enabling Authenticated origin pull on the attacker account is enough.<br>
+<br>
+<br>
+If you use Cloudflare WAF, and cant periodically rotate IP at the same time you are sure the IP will not leak by the application or subdomains, use a custom authenticated pull certificate or use a cloudflare tunnel, you are facing a real risk of a attacker being able to complete ignore any security layers on cloudflare application, from WAF vulnerability mitigations to HTTP DOS.<br>
+Or not, since cloudflare is the product owner and stated this has no impact, they are probaly right and i am probaly wrong.<br>
+<br>
+<h1>Protect and hide your Origin Server IP by any cost, and rotate periodically, or someone could just start mapping the entire IPv4 space and find you</h1><br>
