@@ -12,6 +12,7 @@ All this with the bonus of not being logged on the target waf in anyway<br>
 Being able to HTTP DOS, ignore any WAF restrictions, and test/exploit any vulnerabilities that would otherwise be blocked by the managed rules.<br>
 <br>
 <h2>mitigations</h2><br>
+* Follow this instructions https://stackoverflow.com/questions/50865917/use-htaccess-to-only-allow-requests-if-a-header-with-a-specific-value-is-presen and Set it on Cloudflare -> Transform Rules -> HTTP Request Header Modification<br>
 * Rotate your IP address and make the possible and impossible to never leak the Origin IP address<br>
 * Use a custom authenticated Origin pull certificate (Enterprise only) (not tested)<br>
 * Use a cloudflare tunnel and NEVER leak the cname<br>
