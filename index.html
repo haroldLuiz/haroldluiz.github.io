@@ -60,7 +60,7 @@ Testing the rule:<br>
 <h3>Bypassing UFW</h3><br>
 On this step i will show how to bypass the Firewall IPTables rules (UFW)<br>
 <br>
-As stated before, as a requirement for this bypass you need to know/discover the Origin IP fo the target in one of the many possivle ways, this screenshot shows, a DNS entry on another domain, another account (@gmail.com) to the same Origin IP.<br>
+As stated before, as a requirement for this bypass you need to know/discover the Origin IP for the target in one of the many possivle ways, this screenshot shows, a DNS entry on another domain, another account (@gmail.com) to the same Origin IP.<br>
 <img src="images/11cart_dns.png"><br>
 SSL/TLS need to be setup to "Full" since the Edge certificate is from another account<br>
 <img src="images/12cart_ssl.png"><br>
@@ -103,7 +103,6 @@ Acessing the attacker website, bypassing both authenticated origin pull and the 
 Since the certificate is the same for almost all Authenticated Origin Pull, enabling Authenticated origin pull on the attacker account is enough.<br>
 <br>
 <br>
-If you use Cloudflare WAF, and cant periodically rotate IP at the same time you are sure the IP will not leak by the application or subdomains, use a custom authenticated pull certificate or use a cloudflare tunnel, you are facing a real risk of a attacker being able to complete ignore any security layers on cloudflare application, from WAF vulnerability mitigations to HTTP DOS.<br>
-Or not, since cloudflare is the product owner and stated this has no impact, they are probaly right and i am probaly wrong.<br>
+If you use Cloudflare WAF, and cant periodically rotate IP or you are not sure the IP will not leak by the application or subdomains, use a custom authenticated pull certificate or use a cloudflare tunnel, you are facing a real risk of a attacker being able to complete ignore any security layers on cloudflare application, from WAF vulnerability mitigations to HTTP DOS.<br>
 <br>
 <h1>Protect and hide your Origin Server IP by any cost, and rotate periodically, or someone could just start mapping the entire IPv4 space and find you</h1><br>
